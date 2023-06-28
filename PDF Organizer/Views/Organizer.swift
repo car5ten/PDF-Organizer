@@ -43,8 +43,12 @@ class Organizer: ObservableObject {
             guard let url,
                   let pdf = PDFDocument(url: url) else { return }
             for pdfHandler in pdfHandlers {
-                let fileResult = await pdfHandler.fileResult(from: pdf, fileURL: url)
-                print(fileResult)
+                if let fileResult = await pdfHandler.fileResult(from: pdf, fileURL: url) {
+                    // TODO: handle renaming
+                } else {
+                    // TODO: handle unable to rename
+                }
+
             }
 //            let fileProgress = file.loadFileRepresentation(for: .pdf, openInPlace: true) { url, _, _ in
 //                guard let url,

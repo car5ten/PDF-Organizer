@@ -13,39 +13,28 @@ protocol PDFHandler {
     // MARK: - Properties
 
     var author: String? { get }
-    var searchTerms: [String] { get }
-    var dateRegex: Regex<Substring>? { get }
-    var dateFormatter: DateFormatter? { get }
 
     // MARK: - Methods
 
-    func fileResult(from pdf: PDFDocument, fileURL: URL) async -> Organizer.FileResult
+    func fileResult(from pdf: PDFDocument, fileURL: URL) async -> Organizer.FileResult?
 
     // MARK: - Analyzing Methods
 
-    func nameByAuthor(of pdf: PDFDocument, with fileURL: URL) -> String?
-    func nameBySearchTerms(in pdf: PDFDocument, with fileURL: URL) -> String?
-    func nameByVision(in pdf: PDFDocument, with fileURL: URL) async -> String?
+    func creationDateByAuthor(of pdf: PDFDocument) -> Date?
+    func observationsFromVision(in pdf: PDFDocument, with fileURL: URL) async -> [String]?
 }
 
 extension PDFHandler {
 
-    func nameByAuthor(of pdf: PDFDocument, with fileURL: URL) -> String? {
+    func creationDateByAuthor(of pdf: PDFDocument) -> Date? {
         guard let dict = pdf.documentAttributes,
               let author = dict["Author"] as? String,
               self.author == author,
-              let creationDate = dict["CreationDate"] as? Date,
-              let accountNumber = try? dateRegex?.firstMatch(in: fileURL.lastPathComponent)?.output,
-              let dateFormatter else { return nil }
-        let dateString = dateFormatter.string(from: creationDate)
-        return dateString + "_" + accountNumber + ".pdf"
+              let creationDate = dict["CreationDate"] as? Date else { return nil }
+        return creationDate
     }
 
-    func nameBySearchTerms(in pdf: PDFDocument, with fileURL: URL) -> String? {
-        return nil
-    }
-
-    func nameByVision(in pdf: PDFDocument, with fileURL: URL) async -> String? {
+    func observationsFromVision(in pdf: PDFDocument, with fileURL: URL) async -> [String]? {
         guard let firstPage = pdf.page(at: 0) else { return nil }
         let pageRect = firstPage.bounds(for: .mediaBox)
         let image = NSImage(size: .init(width: pageRect.size.width, height: pageRect.size.height))
@@ -83,10 +72,11 @@ extension PDFHandler {
                     continuation.resume(throwing: error)
                 }
             }
+            return observations
         }
         catch {
             print(error)
+            return nil
         }
-        return ""
     }
 }
