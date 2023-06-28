@@ -7,6 +7,8 @@
 
 import SwiftUI
 import PDFKit
+import AppKit
+import Vision
 
 class Organizer: ObservableObject {
 
@@ -28,15 +30,16 @@ class Organizer: ObservableObject {
             let fileProgress = file.loadFileRepresentation(for: .pdf, openInPlace: true) { url, _, _ in
                 guard let url,
                       let pdf = PDFDocument(url: url) else { return }
-
                 let fileName = url.lastPathComponent
                 var newFileName: String?
-                if let authorName = self.nameByAuthor(of: pdf, with: fileName) {
+                if pdf.string?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == true {
+                    newFileName = self.nameByVision(in: pdf, with: fileName)
+                } else if let authorName = self.nameByAuthor(of: pdf, with: fileName) {
                     newFileName = authorName
                 } else if let searchTermName = self.nameBySearchTerms(in: pdf, with: fileName) {
                     newFileName = searchTermName
-                } else if let visionName = self.nameByVision(in: pdf, with: fileName) {
-                    newFileName = visionName
+                } else {
+                    newFileName = "NOT_CONVERTED"
                 }
 
                 guard let newFileName,
@@ -86,7 +89,38 @@ class Organizer: ObservableObject {
     }
 
     private func nameByVision(in pdf: PDFDocument, with fileName: String) -> String? {
-        // TODO
+        // TODO: add completion handler
+        guard let firstPage = pdf.page(at: 0) else { return nil }
+        let pageRect = firstPage.bounds(for: .mediaBox)
+        let image = NSImage(size: .init(width: pageRect.size.width, height: pageRect.size.height))
+        image.lockFocus()
+        guard let context = NSGraphicsContext.current?.cgContext else { return nil }
+        context.saveGState()
+        context.setFillColor(NSColor.white.cgColor)
+        context.fill(.init(origin: .zero, size: .init(width: pageRect.size.width, height: pageRect.size.height)))
+
+        firstPage.draw(with: .mediaBox, to: context)
+
+        context.restoreGState()
+        image.unlockFocus()
+        guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
+        let request = VNRecognizeTextRequest { request, error in
+            guard let observations = request.results as? [VNRecognizedTextObservation] else {
+
+                return
+            }
+
+            let recognizedTexts = observations.compactMap { observation in
+                observation.topCandidates(1).first?.string
+            }
+
+            print(recognizedTexts)
+//            completionHandler(recognizedTexts, nil)
+        }
+
+        let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+
+        try? requestHandler.perform([request])
         return nil
     }
 
