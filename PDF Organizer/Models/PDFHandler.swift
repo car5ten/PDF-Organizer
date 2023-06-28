@@ -19,13 +19,13 @@ protocol PDFHandler {
 
     // MARK: - Methods
 
-    func fileResult(from pdf: PDFDocument, fileURL: URL, completionHandler: (Organizer.FileResult) -> Void)
+    func fileResult(from pdf: PDFDocument, fileURL: URL) async -> Organizer.FileResult
 
     // MARK: - Analyzing Methods
 
     func nameByAuthor(of pdf: PDFDocument, with fileURL: URL) -> String?
     func nameBySearchTerms(in pdf: PDFDocument, with fileURL: URL) -> String?
-    func nameByVision(in pdf: PDFDocument, with fileURL: URL, completionHandler: (String?) -> Void)
+    func nameByVision(in pdf: PDFDocument, with fileURL: URL) async -> String?
 }
 
 extension PDFHandler {
@@ -45,18 +45,12 @@ extension PDFHandler {
         return nil
     }
 
-    func nameByVision(in pdf: PDFDocument, with fileURL: URL, completionHandler: (String?) -> Void) {
-        guard let firstPage = pdf.page(at: 0) else {
-            completionHandler(nil)
-            return
-        }
+    func nameByVision(in pdf: PDFDocument, with fileURL: URL) async -> String? {
+        guard let firstPage = pdf.page(at: 0) else { return nil }
         let pageRect = firstPage.bounds(for: .mediaBox)
         let image = NSImage(size: .init(width: pageRect.size.width, height: pageRect.size.height))
         image.lockFocus()
-        guard let context = NSGraphicsContext.current?.cgContext else {
-            completionHandler(nil)
-            return
-        }
+        guard let context = NSGraphicsContext.current?.cgContext else { return nil }
         context.saveGState()
         context.setFillColor(NSColor.white.cgColor)
         context.fill(.init(origin: .zero, size: .init(width: pageRect.size.width, height: pageRect.size.height)))
@@ -65,25 +59,34 @@ extension PDFHandler {
 
         context.restoreGState()
         image.unlockFocus()
-        guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
-            completionHandler(nil)
-            return
-        }
-        let request = VNRecognizeTextRequest { request, error in
-            guard let observations = request.results as? [VNRecognizedTextObservation] else {
-                completionHandler(nil)
-                return
+        guard let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else { return nil }
+
+        do {
+            let observations: [String] = try await withCheckedThrowingContinuation { continuation in
+                let request = VNRecognizeTextRequest { request, error in
+                    if let error {
+                        continuation.resume(throwing: error)
+                    } else {
+                        let observations = request.results as? [VNRecognizedTextObservation]
+                        let recognizedTexts = observations?.compactMap { observation in
+                            observation.topCandidates(1).first?.string
+                        } ?? []
+                        continuation.resume(returning: recognizedTexts)
+                    }
+                }
+
+                let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+
+                do {
+                    try requestHandler.perform([request])
+                } catch {
+                    continuation.resume(throwing: error)
+                }
             }
-
-            let recognizedTexts = observations.compactMap { observation in
-                observation.topCandidates(1).first?.string
-            }
-            print(recognizedTexts)
-            completionHandler(nil)
         }
-
-        let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-
-        try? requestHandler.perform([request])
+        catch {
+            print(error)
+        }
+        return ""
     }
 }

@@ -45,7 +45,12 @@ struct ContentView: View {
             .frame(width: 150, height: 150)
         }
         .frame(minWidth: 200, maxWidth: .infinity, minHeight: 200, maxHeight: .infinity)
-        .onDrop(of: [.pdf], isTargeted: $isTargetted, perform: organizer.organize)
+        .onDrop(of: [.pdf], isTargeted: $isTargetted) { (files: [NSItemProvider]) in
+            Task {
+                await organizer.organize(files)
+            }
+            return true
+        }
     }
 }
 
@@ -57,7 +62,13 @@ struct ContentView_Previews: PreviewProvider {
         ContentView()
             .environmentObject(organizer)
             .onAppear {
-                organizer.organize([])
+                Task {
+                    await organizer.organize([])
+                }
             }
     }
+}
+
+extension NSItemProvider: @unchecked Sendable {
+
 }

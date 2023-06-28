@@ -29,38 +29,56 @@ class Organizer: ObservableObject {
     var pdfHandlers: [PDFHandler] = []
     var isWorking: Bool { currentCount != totalCount }
 
-    func organize(_ files: [NSItemProvider]) -> Bool {
-        guard files.isEmpty == false else { return false }
+    func organize(_ files: [NSItemProvider]) async {
+        guard files.isEmpty == false else { return }
         progress = .init(totalUnitCount: Int64(files.count))
         for file in files {
-            let fileProgress = file.loadFileRepresentation(for: .pdf, openInPlace: true) { url, _, _ in
-                guard let url,
-                      let pdf = PDFDocument(url: url) else { return }
-                for pdfHandler in self.pdfHandlers {
-                    let fileResult = pdfHandler.fileResult(from: pdf, fileURL: url)
-                    print(fileResult)
+            let url: URL? = await withCheckedContinuation { continuation in
+                let fileProgress = file.loadFileRepresentation(for: .pdf, openInPlace: true) { url, _, _ in
+                    continuation.resume(with: .success(url))
                 }
-//                let fileName = url.lastPathComponent
-//                var newFileName: String?
-//                if pdf.string?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == true {
-//                    newFileName = self.nameByVision(in: pdf, with: fileName)
-//                } else if let authorName = self.nameByAuthor(of: pdf, with: fileName) {
-//                    newFileName = authorName
-//                } else if let searchTermName = self.nameBySearchTerms(in: pdf, with: fileName) {
-//                    newFileName = searchTermName
-//                } else {
-//                    newFileName = "NOT_CONVERTED"
-//                }
-
-//                guard let newFileName,
-//                      case .success(let targetUrl) = self.createDirectoryIfNecessary(at: url) else { return }
-//
-//                let copyPath = targetUrl.appending(component: newFileName)
-//                FileManager.default.secureCopyItem(at: url, to: copyPath)
+                progress.addChild(progress, withPendingUnitCount: fileProgress.totalUnitCount)
             }
-            progress.addChild(fileProgress, withPendingUnitCount: fileProgress.totalUnitCount)
+
+            guard let url,
+                  let pdf = PDFDocument(url: url) else { return }
+            for pdfHandler in pdfHandlers {
+                let fileResult = await pdfHandler.fileResult(from: pdf, fileURL: url)
+                print(fileResult)
+            }
+//            let fileProgress = file.loadFileRepresentation(for: .pdf, openInPlace: true) { url, _, _ in
+//                guard let url,
+//                      let pdf = PDFDocument(url: url) else { return }
+//                for pdfHandler in self.pdfHandlers {
+////                    let fileResult = pdfHandler.fileResult(from: pdf, fileURL: url)
+////                    print(fileResult)
+//                }
+////                let fileName = url.lastPathComponent
+////                var newFileName: String?
+////                if pdf.string?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == true {
+////                    newFileName = self.nameByVision(in: pdf, with: fileName)
+////                } else if let authorName = self.nameByAuthor(of: pdf, with: fileName) {
+////                    newFileName = authorName
+////                } else if let searchTermName = self.nameBySearchTerms(in: pdf, with: fileName) {
+////                    newFileName = searchTermName
+////                } else {
+////                    newFileName = "NOT_CONVERTED"
+////                }
+//
+////                guard let newFileName,
+////                      case .success(let targetUrl) = self.createDirectoryIfNecessary(at: url) else { return }
+////
+////                let copyPath = targetUrl.appending(component: newFileName)
+////                FileManager.default.secureCopyItem(at: url, to: copyPath)
+//            }
         }
-        return true
+        return
+    }
+
+    func asynctest() async {
+        await withCheckedContinuation { cont in
+            cont.resume()
+        }
     }
 
     private func createDirectoryIfNecessary(at url: URL) -> Result<URL, Error> {
