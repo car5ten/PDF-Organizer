@@ -11,7 +11,7 @@
 		58800F282A43624E0072E152 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58800F272A43624E0072E152 /* ContentView.swift */; };
 		58800F2A2A43624F0072E152 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 58800F292A43624F0072E152 /* Assets.xcassets */; };
 		58800F2E2A43624F0072E152 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 58800F2D2A43624F0072E152 /* Preview Assets.xcassets */; };
-		58800F352A4363140072E152 /* PDF.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58800F342A4363140072E152 /* PDF.swift */; };
+		58800F352A4363140072E152 /* PDFHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58800F342A4363140072E152 /* PDFHandler.swift */; };
 		58800F372A4364B00072E152 /* Organizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58800F362A4364B00072E152 /* Organizer.swift */; };
 /* End PBXBuildFile section */
 
@@ -22,7 +22,7 @@
 		58800F292A43624F0072E152 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		58800F2B2A43624F0072E152 /* PDF_Organizer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PDF_Organizer.entitlements; sourceTree = "<group>"; };
 		58800F2D2A43624F0072E152 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		58800F342A4363140072E152 /* PDF.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDF.swift; sourceTree = "<group>"; };
+		58800F342A4363140072E152 /* PDFHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFHandler.swift; sourceTree = "<group>"; };
 		58800F362A4364B00072E152 /* Organizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Organizer.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -86,7 +86,7 @@
 		58800F392A437E220072E152 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				58800F342A4363140072E152 /* PDF.swift */,
+				58800F342A4363140072E152 /* PDFHandler.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -162,7 +162,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				58800F282A43624E0072E152 /* ContentView.swift in Sources */,
-				58800F352A4363140072E152 /* PDF.swift in Sources */,
+				58800F352A4363140072E152 /* PDFHandler.swift in Sources */,
 				58800F262A43624E0072E152 /* PDF_OrganizerApp.swift in Sources */,
 				58800F372A4364B00072E152 /* Organizer.swift in Sources */,
 			);
