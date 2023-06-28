@@ -7,40 +7,27 @@
 
 import Foundation
 
-struct Directory {
+class Directory {
     let name: String
     let fileNameSuffix: String?
-    let parents: [Directory]
+    weak private(set) var parent: Directory?
 
     var inversePath: URL {
-        parents.reduce(URL(string: name)!) { child, parent in
-            return parent.inversePath.appending(path: child.path())
-        }
+        parent?.inversePath.appending(path: name) ?? URL(string: name)!
     }
 
-    init(name: String, fileNameSuffix: String? = nil, parents: [Directory] = []) {
+    init(name: String, fileNameSuffix: String? = nil, parent: Directory? = nil) {
         self.name = name
         self.fileNameSuffix = fileNameSuffix
-        self.parents = parents
-    }
-
-    init(name: String, fileNameSuffix: String? = nil, @DirectoryBuilder _ builder: () -> [Directory]) {
-        self.name = name
-        self.fileNameSuffix = fileNameSuffix
-        self.parents = builder()
-    }
-}
-
-@resultBuilder
-struct DirectoryBuilder {
-    static func buildBlock(_ parents: Directory...) -> [Directory] {
-        parents
+        self.parent = parent
     }
 }
 
 enum Tree {
-    static let converted = Directory(name: "Converted")
-    static let failed = Directory(name: "Failed") {
-        converted
+    static func converted(_ parent: Directory) -> Directory {
+        .init(name: "Converted", parent: parent)
+    }
+    static func failed(_ parent: Directory) -> Directory {
+        .init(name: "Failed", parent: parent)
     }
 }

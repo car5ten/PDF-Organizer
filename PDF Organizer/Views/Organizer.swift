@@ -17,10 +17,6 @@ class Organizer: ObservableObject {
         let directory: URL
     }
 
-    private enum Constants {
-        static let targetDirectoryName = "Converted"
-    }
-
     private var progress: Progress = .init()
 
     @Published var currentCount: Float = 0
@@ -42,66 +38,40 @@ class Organizer: ObservableObject {
 
             guard let url,
                   let pdf = PDFDocument(url: url) else { return }
+            let rootDirectory = Directory(name: url.deletingLastPathComponent().absoluteString)
+            let convertedDirectory = Tree.converted(rootDirectory)
+            let failedDirectory = Tree.failed(convertedDirectory)
+            guard case .success = createDirectoryIfNecessary(at: failedDirectory.inversePath) else { return }
+
             for pdfHandler in pdfHandlers {
                 if let fileResult = await pdfHandler.fileResult(from: pdf, fileURL: url) {
-                    // TODO: handle renaming
+                    let fileDirectory = convertedDirectory.inversePath.appending(path: fileResult.directory.path())
+                    guard case .success = createDirectoryIfNecessary(at: fileDirectory) else { return }
+                    let fileUrl = fileDirectory.appending(component: fileResult.fileName)
+                    FileManager.default.secureCopyItem(at: url, to: fileUrl)
                 } else {
-                    // TODO: handle unable to rename
+                    FileManager.default.secureCopyItem(at: url, to: failedDirectory.inversePath.appending(component: url.lastPathComponent))
                 }
 
             }
-//            let fileProgress = file.loadFileRepresentation(for: .pdf, openInPlace: true) { url, _, _ in
-//                guard let url,
-//                      let pdf = PDFDocument(url: url) else { return }
-//                for pdfHandler in self.pdfHandlers {
-////                    let fileResult = pdfHandler.fileResult(from: pdf, fileURL: url)
-////                    print(fileResult)
-//                }
-////                let fileName = url.lastPathComponent
-////                var newFileName: String?
-////                if pdf.string?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == true {
-////                    newFileName = self.nameByVision(in: pdf, with: fileName)
-////                } else if let authorName = self.nameByAuthor(of: pdf, with: fileName) {
-////                    newFileName = authorName
-////                } else if let searchTermName = self.nameBySearchTerms(in: pdf, with: fileName) {
-////                    newFileName = searchTermName
-////                } else {
-////                    newFileName = "NOT_CONVERTED"
-////                }
-//
-////                guard let newFileName,
-////                      case .success(let targetUrl) = self.createDirectoryIfNecessary(at: url) else { return }
-////
-////                let copyPath = targetUrl.appending(component: newFileName)
-////                FileManager.default.secureCopyItem(at: url, to: copyPath)
-//            }
         }
         return
     }
 
-    func asynctest() async {
-        await withCheckedContinuation { cont in
-            cont.resume()
-        }
-    }
-
     private func createDirectoryIfNecessary(at url: URL) -> Result<URL, Error> {
         let fileManager = FileManager.default
-        let targetUrl = url
-            .deletingLastPathComponent()
-            .appending(path: Constants.targetDirectoryName)
         var isDirectory: ObjCBool = false
-        if fileManager.fileExists(atPath: targetUrl.path(), isDirectory: &isDirectory) == false {
+        if fileManager.fileExists(atPath: url.path(), isDirectory: &isDirectory) == false {
             do {
-                try fileManager.createDirectory(atPath: targetUrl.path(),
+                try fileManager.createDirectory(atPath: url.path(),
                                                 withIntermediateDirectories: true,
                                                 attributes: nil)
-                return .success(targetUrl)
+                return .success(url)
             } catch {
                 return .failure(error)
             }
         }
-        return .success(targetUrl)
+        return .success(url)
     }
 }
 
