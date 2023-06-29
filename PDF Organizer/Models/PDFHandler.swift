@@ -16,6 +16,7 @@ protocol PDFHandler {
 
     // MARK: - Methods
 
+    func matches(pdf: PDFDocument) -> Bool
     func fileResult(from pdf: PDFDocument, fileURL: URL) async -> Organizer.FileResult?
 
     // MARK: - Analyzing Methods
