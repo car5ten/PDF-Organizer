@@ -45,8 +45,22 @@ extension PDFHandler {
     }
 
     func observationsFromVision(in pdf: PDFDocument) async -> [String]? {
-        guard let firstPage = pdf.page(at: 0) else { return nil }
-        let pageRect = firstPage.bounds(for: .mediaBox)
+        var observations: [String]?
+        for index in 0 ..< pdf.pageCount {
+            guard let page = pdf.page(at: index),
+                  let newObservations = await observationsFromVision(of: page) else { continue }
+            if observations != nil {
+                observations = (observations ?? []) + newObservations
+            } else {
+                observations = newObservations
+            }
+        }
+        guard let observations else { return nil }
+        return Array(Set(observations))
+    }
+
+    private func observationsFromVision(of page: PDFPage) async -> [String]? {
+        let pageRect = page.bounds(for: .mediaBox)
         let image = NSImage(size: .init(width: pageRect.size.width, height: pageRect.size.height))
         image.lockFocus()
         guard let context = NSGraphicsContext.current?.cgContext else { return nil }
@@ -54,7 +68,7 @@ extension PDFHandler {
         context.setFillColor(NSColor.white.cgColor)
         context.fill(.init(origin: .zero, size: .init(width: pageRect.size.width, height: pageRect.size.height)))
 
-        firstPage.draw(with: .mediaBox, to: context)
+        page.draw(with: .mediaBox, to: context)
 
         context.restoreGState()
         image.unlockFocus()
