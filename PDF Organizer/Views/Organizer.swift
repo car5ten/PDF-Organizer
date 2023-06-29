@@ -33,7 +33,7 @@ class Organizer: ObservableObject {
                 let fileProgress = file.loadFileRepresentation(for: .pdf, openInPlace: true) { url, _, _ in
                     continuation.resume(with: .success(url))
                 }
-                progress.addChild(progress, withPendingUnitCount: fileProgress.totalUnitCount)
+                progress.addChild(fileProgress, withPendingUnitCount: fileProgress.totalUnitCount)
             }
 
             guard let url,

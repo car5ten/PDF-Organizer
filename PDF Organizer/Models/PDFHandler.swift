@@ -26,6 +26,7 @@ protocol PDFHandler {
 
 extension PDFHandler {
 
+    var author: String? { nil }
     func creationDateByAuthor(of pdf: PDFDocument) -> Date? {
         guard let dict = pdf.documentAttributes,
               let author = dict["Author"] as? String,
