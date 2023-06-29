@@ -45,7 +45,7 @@ class Organizer: ObservableObject {
 
             for pdfHandler in pdfHandlers {
                 guard pdfHandler.matches(pdf: pdf) else { continue }
-                if let fileResult = await pdfHandler.fileResult(from: pdf, fileURL: url) {
+                if let fileResult = await pdfHandler.fileResult(from: pdf) {
                     let fileDirectory = convertedDirectory.inversePath.appending(path: fileResult.directory.path())
                     guard case .success = createDirectoryIfNecessary(at: fileDirectory) else { return }
                     let fileUrl = fileDirectory.appending(component: fileResult.fileName)

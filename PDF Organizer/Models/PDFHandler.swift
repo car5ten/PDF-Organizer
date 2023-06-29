@@ -17,12 +17,12 @@ protocol PDFHandler {
     // MARK: - Methods
 
     func matches(pdf: PDFDocument) -> Bool
-    func fileResult(from pdf: PDFDocument, fileURL: URL) async -> Organizer.FileResult?
+    func fileResult(from pdf: PDFDocument) async -> Organizer.FileResult?
 
     // MARK: - Analyzing Methods
 
     func creationDateByAuthor(of pdf: PDFDocument) -> Date?
-    func observationsFromVision(in pdf: PDFDocument, with fileURL: URL) async -> [String]?
+    func observationsFromVision(in pdf: PDFDocument) async -> [String]?
 }
 
 extension PDFHandler {
@@ -36,7 +36,7 @@ extension PDFHandler {
         return creationDate
     }
 
-    func observationsFromVision(in pdf: PDFDocument, with fileURL: URL) async -> [String]? {
+    func observationsFromVision(in pdf: PDFDocument) async -> [String]? {
         guard let firstPage = pdf.page(at: 0) else { return nil }
         let pageRect = firstPage.bounds(for: .mediaBox)
         let image = NSImage(size: .init(width: pageRect.size.width, height: pageRect.size.height))
