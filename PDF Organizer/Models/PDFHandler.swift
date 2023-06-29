@@ -12,11 +12,12 @@ protocol PDFHandler {
 
     // MARK: - Properties
 
+    var searchTerms: [String] { get }
     var author: String? { get }
 
     // MARK: - Methods
 
-    func matches(pdf: PDFDocument) -> Bool
+    func matches(pdf: PDFDocument) async -> Bool
     func fileResult(from pdf: PDFDocument) async -> Organizer.FileResult?
 
     // MARK: - Analyzing Methods
@@ -28,6 +29,13 @@ protocol PDFHandler {
 extension PDFHandler {
 
     var author: String? { nil }
+
+    func matches(pdf: PDFDocument) async -> Bool {
+        guard let observations = await observationsFromVision(in: pdf),
+              Set(observations).intersection(searchTerms).count == searchTerms.count else { return false }
+        return true
+    }
+
     func creationDateByAuthor(of pdf: PDFDocument) -> Date? {
         guard let dict = pdf.documentAttributes,
               let author = dict["Author"] as? String,
