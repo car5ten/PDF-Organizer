@@ -12,29 +12,47 @@ protocol PDFHandler {
 
     // MARK: - Properties
 
+    var uniqueIdentifier: String { get }
+    var matchFirstPageOnly: Bool { get }
+    var matchFullSearchTerm: Bool { get }
     var searchTerms: [String] { get }
     var author: String? { get }
 
-    // MARK: - Methods
+    // MARK: - Result Method
 
-    func matches(pdf: PDFDocument) async -> Bool
     func fileResult(from pdf: PDFDocument) async -> Organizer.FileResult?
+
+    // MARK: - Identifier Methods
+
+    func isHandler(for pdf: PDFDocument) async -> Bool
+    func matches(pdf: PDFDocument) async -> Bool
 
     // MARK: - Analyzing Methods
 
     func creationDateByAuthor(of pdf: PDFDocument) -> Date?
     func observationsFromVision(in pdf: PDFDocument) async -> [String]?
+    func findSearchTerms(in observations: [String]) -> Bool
 }
 
 extension PDFHandler {
 
     var author: String? { nil }
+    var matchFirstPageOnly: Bool { true }
+    var matchFullSearchTerm: Bool { true }
+
+    // MARK: - Identifier Methods
+
+    func isHandler(for pdf: PDFDocument) async -> Bool {
+        guard let observations = await observationsFromVision(in: pdf) else { return false }
+        return find(searchTerms: [uniqueIdentifier], in: observations, matchFullSearchTerm: true)
+    }
 
     func matches(pdf: PDFDocument) async -> Bool {
-        guard let observations = await observationsFromVision(in: pdf),
-              Set(observations).intersection(searchTerms).count == searchTerms.count else { return false }
-        return true
+        guard let observations = await observationsFromVision(in: pdf) else { return false }
+        return find(searchTerms: searchTerms, in: observations, matchFullSearchTerm: matchFullSearchTerm)
     }
+
+    // MARK: - Analyzing Methods
 
     func creationDateByAuthor(of pdf: PDFDocument) -> Date? {
         guard let dict = pdf.documentAttributes,
@@ -45,8 +63,9 @@ extension PDFHandler {
     }
 
     func observationsFromVision(in pdf: PDFDocument) async -> [String]? {
+        let pageRange = matchFirstPageOnly ? 0 ..< 1 : 0 ..< pdf.pageCount
         var observations: [String]?
-        for index in 0 ..< pdf.pageCount {
+        for index in pageRange {
             guard let page = pdf.page(at: index),
                   let newObservations = await observationsFromVision(of: page) else { continue }
             if observations != nil {
@@ -57,6 +76,20 @@ extension PDFHandler {
         }
         guard let observations else { return nil }
         return Array(Set(observations))
+    }
+
+    private func find(searchTerms: [String], in observations: [String], matchFullSearchTerm: Bool) -> Bool {
+        if matchFullSearchTerm {
+            return Set(observations).intersection(searchTerms).isEmpty == false
+        } else {
+            let match = observations.first { observation in
+                let match = searchTerms.first { searchTerm in
+                    observation.contains(searchTerm)
+                }
+                return match != nil
+            }
+            return match != nil
+        }
     }
 
     private func observationsFromVision(of page: PDFPage) async -> [String]? {
