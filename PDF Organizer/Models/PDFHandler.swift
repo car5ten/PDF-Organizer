@@ -31,7 +31,6 @@ protocol PDFHandler {
 
     func creationDateByAuthor(of pdf: PDFDocument) -> Date?
     func observationsFromVision(in pdf: PDFDocument) async -> [String]?
-    func findSearchTerms(in observations: [String]) -> Bool
 }
 
 extension PDFHandler {
