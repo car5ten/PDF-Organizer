@@ -55,6 +55,7 @@ class Organizer: ObservableObject {
                 } else {
                     FileManager.default.secureCopyItem(at: url, to: failedDirectory.inversePath.appending(component: url.lastPathComponent))
                 }
+                break
             }
 
             if foundHandler == false {
