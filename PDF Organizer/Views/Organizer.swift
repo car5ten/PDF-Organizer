@@ -43,8 +43,10 @@ class Organizer: ObservableObject {
             let failedDirectory = Tree.failed(convertedDirectory)
             guard case .success = createDirectoryIfNecessary(at: failedDirectory.inversePath) else { return }
 
+            var foundHandler: Bool = false
             for pdfHandler in pdfHandlers {
                 guard await pdfHandler.isHandler(for: pdf) else { continue }
+                foundHandler = true
                 if let fileResult = await pdfHandler.fileResult(from: pdf) {
                     let fileDirectory = convertedDirectory.inversePath.appending(path: fileResult.directory.path())
                     guard case .success = createDirectoryIfNecessary(at: fileDirectory) else { return }
@@ -53,7 +55,10 @@ class Organizer: ObservableObject {
                 } else {
                     FileManager.default.secureCopyItem(at: url, to: failedDirectory.inversePath.appending(component: url.lastPathComponent))
                 }
+            }
 
+            if foundHandler == false {
+                FileManager.default.secureCopyItem(at: url, to: failedDirectory.inversePath.appending(component: url.lastPathComponent))
             }
         }
         return
