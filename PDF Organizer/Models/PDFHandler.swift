@@ -44,7 +44,7 @@ extension PDFHandler {
     func isHandler(for pdf: PDFDocument) async -> Bool {
         var isHandler = false
         if creationDateByAuthor(of: pdf) != nil {
-            isHandler = true
+            isHandler = await matches(pdf: pdf)
         } else if let observations = await observationsFromVision(in: pdf) {
             isHandler = find(searchTerms: [uniqueIdentifier], in: observations, matchFullSearchTerm: true)
         }
