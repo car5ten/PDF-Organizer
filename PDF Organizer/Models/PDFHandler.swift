@@ -42,8 +42,13 @@ extension PDFHandler {
     // MARK: - Identifier Methods
 
     func isHandler(for pdf: PDFDocument) async -> Bool {
-        guard let observations = await observationsFromVision(in: pdf) else { return false }
-        return find(searchTerms: [uniqueIdentifier], in: observations, matchFullSearchTerm: true)
+        var isHandler = false
+        if creationDateByAuthor(of: pdf) != nil {
+            isHandler = true
+        } else if let observations = await observationsFromVision(in: pdf) {
+            isHandler = find(searchTerms: [uniqueIdentifier], in: observations, matchFullSearchTerm: true)
+        }
+        return isHandler
     }
 
     func matches(pdf: PDFDocument) async -> Bool {
