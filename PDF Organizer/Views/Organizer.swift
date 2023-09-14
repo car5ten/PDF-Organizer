@@ -12,87 +12,114 @@ import Vision
 
 class Organizer: ObservableObject {
 
-    struct FileResult {
-        let fileName: String
-        let directory: URL
+    fileprivate enum OrganizerError: Error {
+        case fileIsNoPDF
+        case setupFailed
+        case noPDFHandlerFound
+        case noFileResult
+        case fileDirectoryCreationFailed
+        case fileExists
+        case invalidUrl
+
     }
 
+    // TODO: handle Progress
     private var progress: Progress = .init()
 
-    @Published var currentCount: Float = 0
-    @Published var totalCount: Float = 0
-
     var pdfHandlers: [PDFHandler] = []
-    var isWorking: Bool { currentCount != totalCount }
 
     func organize(_ files: [NSItemProvider]) async {
         guard files.isEmpty == false else { return }
-        progress = .init(totalUnitCount: Int64(files.count))
         for file in files {
-            let url: URL? = await withCheckedContinuation { continuation in
-                let fileProgress = file.loadFileRepresentation(for: .pdf, openInPlace: true) { url, _, _ in
-                    continuation.resume(with: .success(url))
-                }
-                progress.addChild(fileProgress, withPendingUnitCount: fileProgress.totalUnitCount)
+            let setupResult: SetupResult
+            do {
+                setupResult = try await prepareDirectorStructure(for: file)
+            } catch {
+                // setup failed
+                print(error)
+                return
             }
-
-            guard let url,
-                  let pdf = PDFDocument(url: url) else { return }
-            let rootDirectory = Directory(name: url.deletingLastPathComponent().absoluteString)
-            let convertedDirectory = Tree.converted(rootDirectory)
-            let failedDirectory = Tree.failed(convertedDirectory)
-            guard case .success = createDirectoryIfNecessary(at: failedDirectory.inversePath) else { return }
-
-            var foundHandler: Bool = false
-            for pdfHandler in pdfHandlers {
-                guard await pdfHandler.isHandler(for: pdf) else { continue }
-                foundHandler = true
-                if let fileResult = await pdfHandler.fileResult(from: pdf) {
-                    let fileDirectory = convertedDirectory.inversePath.appending(path: fileResult.directory.path())
-                    guard case .success = createDirectoryIfNecessary(at: fileDirectory) else { return }
-                    let fileUrl = fileDirectory.appending(component: fileResult.fileName)
-                    FileManager.default.secureCopyItem(at: url, to: fileUrl)
-                } else {
-                    FileManager.default.secureCopyItem(at: url, to: failedDirectory.inversePath.appending(component: url.lastPathComponent))
-                }
-                break
-            }
-
-            if foundHandler == false {
-                FileManager.default.secureCopyItem(at: url, to: failedDirectory.inversePath.appending(component: url.lastPathComponent))
+            do {
+                let pdfHandler = try await pdfHandler(for: setupResult.pdf)
+                try await process(setupResult, with: pdfHandler)
+            } catch {
+                guard let url = setupResult.pdf.documentURL else { return }
+                try? FileManager.default.secureCopyItem(at: url, to: setupResult.failedDirectory.inversePath.appending(component: url.lastPathComponent))
             }
         }
-        return
     }
 
-    private func createDirectoryIfNecessary(at url: URL) -> Result<URL, Error> {
+    private func createDirectoryIfNecessary(at url: URL) throws {
         let fileManager = FileManager.default
         var isDirectory: ObjCBool = false
-        if fileManager.fileExists(atPath: url.path(), isDirectory: &isDirectory) == false {
-            do {
-                try fileManager.createDirectory(atPath: url.path(),
-                                                withIntermediateDirectories: true,
-                                                attributes: nil)
-                return .success(url)
-            } catch {
-                return .failure(error)
+
+        if fileManager.fileExists(atPath: url.path(),
+                                  isDirectory: &isDirectory) == false {
+
+            try fileManager.createDirectory(atPath: url.path(),
+                                            withIntermediateDirectories: true,
+                                            attributes: nil)
+        }
+    }
+
+    private func prepareDirectorStructure(for file: NSItemProvider) async throws -> SetupResult {
+        let url: URL? = await withCheckedContinuation { continuation in
+            _ = file.loadFileRepresentation(for: .pdf, openInPlace: true) { url, _, _ in
+                continuation.resume(with: .success(url))
             }
         }
-        return .success(url)
+
+        // create PDFDocument
+        guard let url,
+              let pdf = PDFDocument(url: url) else { throw OrganizerError.fileIsNoPDF }
+
+        // setup Directories
+        let rootDirectory = Directory(name: url.deletingLastPathComponent().absoluteString)
+        let organizedDirectory = Tree.organized(rootDirectory)
+        let convertedDirectory = Tree.converted(organizedDirectory)
+        let failedDirectory = Tree.failed(organizedDirectory)
+        do {
+            try createDirectoryIfNecessary(at: failedDirectory.inversePath)
+        } catch {
+            throw OrganizerError.setupFailed
+        }
+        return SetupResult(rootDirectory: rootDirectory,
+                           organizedDirecty: organizedDirectory,
+                           convertedDirectory: convertedDirectory,
+                           failedDirectory: failedDirectory,
+                           pdf: pdf)
+    }
+
+    private func pdfHandler(for pdf: PDFDocument) async throws -> PDFHandler {
+        for pdfHandler in pdfHandlers {
+            guard await pdfHandler.isHandler(for: pdf) else { continue }
+            return pdfHandler
+        }
+        throw OrganizerError.noPDFHandlerFound
+    }
+
+    private func process(_ setupResult: SetupResult, with pdfHandler: PDFHandler) async throws {
+        guard let fileResult = await pdfHandler.fileResult(from: setupResult.pdf) else { throw OrganizerError.noFileResult }
+        let fileDirectory = setupResult.convertedDirectory.inversePath.appending(path: fileResult.directory.path())
+        let fileUrl: URL
+        do {
+            try createDirectoryIfNecessary(at: fileDirectory)
+            fileUrl = fileDirectory.appending(component: fileResult.fileName)
+        } catch {
+            throw OrganizerError.fileDirectoryCreationFailed
+        }
+        guard let pdfUrl = setupResult.pdf.documentURL else { throw OrganizerError.invalidUrl }
+        try FileManager.default.secureCopyItem(at: pdfUrl, to: fileUrl)
     }
 }
 
 private extension FileManager {
 
-    func secureCopyItem(at srcURL: URL, to dstURL: URL) {
-        do {
-            if FileManager.default.fileExists(atPath: dstURL.path) {
-                try FileManager.default.removeItem(at: dstURL)
-            }
-            try FileManager.default.copyItem(at: srcURL, to: dstURL)
-        } catch (let error) {
-            print("Cannot copy item at \(srcURL) to \(dstURL): \(error)")
+    func secureCopyItem(at srcURL: URL, to dstURL: URL) throws {
+        guard FileManager.default.fileExists(atPath: dstURL.path) == false else {
+            throw Organizer.OrganizerError.fileExists
         }
+        try FileManager.default.copyItem(at: srcURL, to: dstURL)
     }
 
 }

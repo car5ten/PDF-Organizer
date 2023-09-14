@@ -24,9 +24,15 @@ class Directory {
 }
 
 enum Tree {
+
+    static func organized(_ parent: Directory) -> Directory {
+        .init(name: "Organized", parent: parent)
+    }
+
     static func converted(_ parent: Directory) -> Directory {
         .init(name: "Converted", parent: parent)
     }
+
     static func failed(_ parent: Directory) -> Directory {
         .init(name: "Failed", parent: parent)
     }

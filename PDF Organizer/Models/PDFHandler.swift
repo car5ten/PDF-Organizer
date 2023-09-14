@@ -20,7 +20,7 @@ protocol PDFHandler {
 
     // MARK: - Result Method
 
-    func fileResult(from pdf: PDFDocument) async -> Organizer.FileResult?
+    func fileResult(from pdf: PDFDocument) async -> FileResult?
 
     // MARK: - Identifier Methods
 
@@ -124,7 +124,6 @@ extension PDFHandler {
                         continuation.resume(returning: recognizedTexts)
                     }
                 }
-
                 let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
 
                 do {

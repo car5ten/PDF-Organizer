@@ -21,25 +21,14 @@ struct ContentView: View {
     var body: some View {
         Group {
             VStack(alignment: .center, spacing: 16) {
-
                 Spacer()
-                if organizer.isWorking {
-                    ProgressView(value: organizer.currentCount,
-                                 total: organizer.totalCount)
-                    .progressViewStyle(.circular)
-                    .tint(.green)
+                Image(systemName: "doc.viewfinder")
+                    .resizable()
                     .frame(width: 50, height: 50, alignment: .center)
-                    Text("\(organizer.currentCount.formatted(Constants.doubleFormat)) / \(organizer.totalCount.formatted(Constants.doubleFormat))")
-                        .font(.title)
-                } else {
-                    Image(systemName: "doc.viewfinder")
-                        .resizable()
-                        .frame(width: 50, height: 50, alignment: .center)
-                        .foregroundColor(isTargetted ? .green : .white)
-                        .animation(.default, value: isTargetted)
-                    Text("Drop files...")
-                        .font(.title)
-                }
+                    .foregroundColor(isTargetted ? .green : .white)
+                    .animation(.default, value: isTargetted)
+                Text("Drop files...")
+                    .font(.title)
                 Spacer()
             }
             .frame(width: 150, height: 150)

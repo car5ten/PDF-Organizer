@@ -14,6 +14,8 @@
 		58800F352A4363140072E152 /* PDFHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58800F342A4363140072E152 /* PDFHandler.swift */; };
 		58800F372A4364B00072E152 /* Organizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58800F362A4364B00072E152 /* Organizer.swift */; };
 		58800F402A4CD6580072E152 /* Directory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58800F3F2A4CD6580072E152 /* Directory.swift */; };
+		589460732AB30C000096548C /* FileResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589460722AB30C000096548C /* FileResult.swift */; };
+		589460752AB30C1B0096548C /* SetupResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 589460742AB30C1B0096548C /* SetupResult.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,8 @@
 		58800F342A4363140072E152 /* PDFHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDFHandler.swift; sourceTree = "<group>"; };
 		58800F362A4364B00072E152 /* Organizer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Organizer.swift; sourceTree = "<group>"; };
 		58800F3F2A4CD6580072E152 /* Directory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Directory.swift; sourceTree = "<group>"; };
+		589460722AB30C000096548C /* FileResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileResult.swift; sourceTree = "<group>"; };
+		589460742AB30C1B0096548C /* SetupResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetupResult.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,6 +94,8 @@
 			children = (
 				58800F342A4363140072E152 /* PDFHandler.swift */,
 				58800F3F2A4CD6580072E152 /* Directory.swift */,
+				589460722AB30C000096548C /* FileResult.swift */,
+				589460742AB30C1B0096548C /* SetupResult.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -165,10 +171,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				58800F282A43624E0072E152 /* ContentView.swift in Sources */,
+				589460752AB30C1B0096548C /* SetupResult.swift in Sources */,
 				58800F402A4CD6580072E152 /* Directory.swift in Sources */,
 				58800F352A4363140072E152 /* PDFHandler.swift in Sources */,
 				58800F262A43624E0072E152 /* PDF_OrganizerApp.swift in Sources */,
 				58800F372A4364B00072E152 /* Organizer.swift in Sources */,
+				589460732AB30C000096548C /* FileResult.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
