@@ -10,16 +10,16 @@ import PDFKit
 
 struct SetupResult {
 
-    private let rootDirectory: Directory
-    private let organizedDirecty: Directory
-    let convertedDirectory: Directory
-    let failedDirectory: Directory
+    private let rootDirectory: LegacyDirectory
+    private let organizedDirecty: LegacyDirectory
+    let convertedDirectory: LegacyDirectory
+    let failedDirectory: LegacyDirectory
     let pdf: PDFDocument
 
-    init(rootDirectory: Directory,
-         organizedDirecty: Directory,
-         convertedDirectory: Directory,
-         failedDirectory: Directory,
+    init(rootDirectory: LegacyDirectory,
+         organizedDirecty: LegacyDirectory,
+         convertedDirectory: LegacyDirectory,
+         failedDirectory: LegacyDirectory,
          pdf: PDFDocument) {
         self.rootDirectory = rootDirectory
         self.organizedDirecty = organizedDirecty

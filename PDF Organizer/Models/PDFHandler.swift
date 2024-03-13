@@ -127,14 +127,14 @@ extension PDFHandler {
                 let requestHandler = VNImageRequestHandler(cgImage: cgImage, options: [:])
 
                 do {
+                    request.recognitionLevel = .fast // TODO: verify speed changes
                     try requestHandler.perform([request])
                 } catch {
                     continuation.resume(throwing: error)
                 }
             }
             return observations
-        }
-        catch {
+        } catch {
             print(error)
             return nil
         }

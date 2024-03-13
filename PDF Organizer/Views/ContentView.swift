@@ -36,7 +36,7 @@ struct ContentView: View {
         .frame(minWidth: 200, maxWidth: .infinity, minHeight: 200, maxHeight: .infinity)
         .onDrop(of: [.pdf], isTargeted: $isTargetted) { (files: [NSItemProvider]) in
             Task {
-                await organizer.organize(files)
+                try? await organizer.organize(files)
             }
             return true
         }
@@ -52,7 +52,7 @@ struct ContentView_Previews: PreviewProvider {
             .environmentObject(organizer)
             .onAppear {
                 Task {
-                    await organizer.organize([])
+                    try? await organizer.organize([])
                 }
             }
     }

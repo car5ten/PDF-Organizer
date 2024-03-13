@@ -7,8 +7,6 @@
 
 import SwiftUI
 import PDFKit
-import AppKit
-import Vision
 
 class Organizer: ObservableObject {
 
@@ -20,31 +18,34 @@ class Organizer: ObservableObject {
         case fileDirectoryCreationFailed
         case fileExists
         case invalidUrl
-
+        case processingFailed
     }
 
     // TODO: handle Progress
     private var progress: Progress = .init()
 
     var pdfHandlers: [PDFHandler] = []
-
-    func organize(_ files: [NSItemProvider]) async {
+    func organize(_ files: [NSItemProvider]) async throws {
         guard files.isEmpty == false else { return }
+        let firstFile = files.first!
+        do {
+            try await prepareDirectorStructure(from: firstFile)
+        } catch {
+            // TODO: show error
+            print(error)
+            return
+        }
+
         for file in files {
-            let setupResult: SetupResult
+            let pdf = try await pdf(from: file)
             do {
-                setupResult = try await prepareDirectorStructure(for: file)
+                let pdfHandler = try await pdfHandler(for: pdf)
+                // TODO: process
             } catch {
-                // setup failed
-                print(error)
-                return
-            }
-            do {
-                let pdfHandler = try await pdfHandler(for: setupResult.pdf)
-                try await process(setupResult, with: pdfHandler)
-            } catch {
-                guard let url = setupResult.pdf.documentURL else { return }
-                try? FileManager.default.secureCopyItem(at: url, to: setupResult.failedDirectory.inversePath.appending(component: url.lastPathComponent))
+                guard let url = pdf.documentURL, let toUrl = Directory.failed(for: pdf)?.path else {
+                    throw OrganizerError.processingFailed
+                }
+                try? FileManager.default.secureCopyItem(at: url, to: toUrl)
             }
         }
     }
@@ -62,32 +63,46 @@ class Organizer: ObservableObject {
         }
     }
 
-    private func prepareDirectorStructure(for file: NSItemProvider) async throws -> SetupResult {
-        let url: URL? = await withCheckedContinuation { continuation in
-            _ = file.loadFileRepresentation(for: .pdf, openInPlace: true) { url, _, _ in
-                continuation.resume(with: .success(url))
+    private func pdf(from file: NSItemProvider) async throws -> PDFDocument {
+        let url: URL = try await withCheckedThrowingContinuation { continuation in
+            _ = file.loadFileRepresentation(for: .pdf, openInPlace: true) { url, inPlace, error in
+                guard inPlace else {
+                    continuation.resume(throwing: OrganizerError.setupFailed)
+                    return
+                }
+                guard let url = url else {
+                    continuation.resume(throwing: error!)
+                    return
+                }
+                continuation.resume(returning: url)
             }
         }
-
-        // create PDFDocument
-        guard let url,
-              let pdf = PDFDocument(url: url) else { throw OrganizerError.fileIsNoPDF }
-
-        // setup Directories
-        let rootDirectory = Directory(name: url.deletingLastPathComponent().absoluteString)
-        let organizedDirectory = Tree.organized(rootDirectory)
-        let convertedDirectory = Tree.converted(organizedDirectory)
-        let failedDirectory = Tree.failed(organizedDirectory)
-        do {
-            try createDirectoryIfNecessary(at: failedDirectory.inversePath)
-        } catch {
-            throw OrganizerError.setupFailed
+        guard let pdf = PDFDocument(url: url) else {
+            throw OrganizerError.invalidUrl
         }
-        return SetupResult(rootDirectory: rootDirectory,
-                           organizedDirecty: organizedDirectory,
-                           convertedDirectory: convertedDirectory,
-                           failedDirectory: failedDirectory,
-                           pdf: pdf)
+        return pdf
+    }
+
+    private func prepareDirectorStructure(from file: NSItemProvider) async throws {
+        let pdf = try await pdf(from: file)
+        guard let url = pdf.documentURL else {
+            throw OrganizerError.invalidUrl
+        }
+        let root = Directory.failed(at: url.deletingLastPathComponent().absoluteString)
+
+        guard let url = root.path else {
+            throw OrganizerError.fileDirectoryCreationFailed
+        }
+        let fileManager = FileManager.default
+        var isDirectory: ObjCBool = false
+
+        if fileManager.fileExists(atPath: url.path(),
+                                  isDirectory: &isDirectory) == false {
+
+            try fileManager.createDirectory(atPath: url.path(),
+                                            withIntermediateDirectories: true,
+                                            attributes: nil)
+        }
     }
 
     private func pdfHandler(for pdf: PDFDocument) async throws -> PDFHandler {
