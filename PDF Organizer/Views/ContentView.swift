@@ -6,17 +6,14 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ContentView: View {
 
-    private enum Constants {
-        static var doubleFormat: FloatingPointFormatStyle<Double> {
-            .number.precision(.fractionLength(0))
-        }
-    }
+    private let fileProcessor = FileProcessor()
 
-    @EnvironmentObject var organizer: Organizer
     @State private var isTargetted: Bool = false
+    @State private var isProcessing = false  // State to control whether processing is happening
 
     var body: some View {
         Group {
@@ -34,30 +31,37 @@ struct ContentView: View {
             .frame(width: 150, height: 150)
         }
         .frame(minWidth: 200, maxWidth: .infinity, minHeight: 200, maxHeight: .infinity)
-        .onDrop(of: [.pdf], isTargeted: $isTargetted) { (files: [NSItemProvider]) in
-            Task {
-                try? await organizer.organize(files)
-            }
+        .onDrop(of: [.pdf], isTargeted: $isTargetted) { providers in
+            processFiles(providers: providers)
             return true
+        }
+        .disabled(isProcessing)
+    }
+
+    // Function to process files and track progress using TaskGroup
+    private func processFiles(providers: [NSItemProvider]) {
+        isProcessing = true  // Disable drop area while processing
+
+        Task {
+            await withTaskGroup(of: Bool.self) { taskGroup in
+                for provider in providers {
+                    taskGroup.addTask {
+                        await fileProcessor.processFile(provider: provider)
+                    }
+                }
+
+                // Collect results from all tasks
+                for await result in taskGroup {
+                    print("did process: \(result)")
+                }
+            }
+
+            // Re-enable drop area after all processing is done
+            DispatchQueue.main.async {
+                isProcessing = false
+            }
         }
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-
-    static var organizer: Organizer = .init()
-
-    static var previews: some View {
-        ContentView()
-            .environmentObject(organizer)
-            .onAppear {
-                Task {
-                    try? await organizer.organize([])
-                }
-            }
-    }
-}
-
-extension NSItemProvider: @unchecked Sendable {
-
-}
+extension NSItemProvider: @retroactive @unchecked Sendable {}

@@ -12,7 +12,6 @@ struct PDF_OrganizerApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(Organizer())
         }
     }
 }
