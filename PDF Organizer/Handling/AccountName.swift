@@ -44,7 +44,7 @@ extension Array where Element == Account {
     /// - Returns: An optional `Account` if a match is found.
     func matches(filename: String) -> Account? {
         self.first { account in
-            account.keywords.contains { keyword in filename.contains(keyword) }
+            account.keywords.allSatisfy { keyword in filename.contains(keyword) }
         }
     }
 }
