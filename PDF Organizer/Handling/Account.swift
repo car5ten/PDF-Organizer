@@ -12,16 +12,6 @@ protocol Account {
     var directory: String { get }
 }
 
-protocol Suffixable {
-    var suffix: String { get }
-}
-
-struct Dummy: Account {
-    var accountNumber: String { "2782161234" }
-    var keywords: [String] { ["Bankname", accountNumber] }
-    var directory: String { "Owner/Bankname/\(accountNumber)" }
-}
-
 enum Accounts {
     static let all: [Account] = [
         Dummy()

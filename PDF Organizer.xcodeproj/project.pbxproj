@@ -18,6 +18,8 @@
 		58800F282A43624E0072E152 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58800F272A43624E0072E152 /* ContentView.swift */; };
 		58800F2A2A43624F0072E152 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 58800F292A43624F0072E152 /* Assets.xcassets */; };
 		58800F2E2A43624F0072E152 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 58800F2D2A43624F0072E152 /* Preview Assets.xcassets */; };
+		588DB0672D837FA400A437B6 /* Suffixable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 588DB0662D837FA400A437B6 /* Suffixable.swift */; };
+		588DB0692D837FBA00A437B6 /* Dummy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 588DB0682D837FBA00A437B6 /* Dummy.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +36,8 @@
 		58800F292A43624F0072E152 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		58800F2B2A43624F0072E152 /* PDF_Organizer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PDF_Organizer.entitlements; sourceTree = "<group>"; };
 		58800F2D2A43624F0072E152 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		588DB0662D837FA400A437B6 /* Suffixable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Suffixable.swift; sourceTree = "<group>"; };
+		588DB0682D837FBA00A437B6 /* Dummy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dummy.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,8 +54,10 @@
 		583388082D492A5000F00D1E /* Handling */ = {
 			isa = PBXGroup;
 			children = (
+				588DB0662D837FA400A437B6 /* Suffixable.swift */,
 				585C44F72D49888C005F9864 /* AccountingType.swift */,
 				585C44F52D49885C005F9864 /* Account.swift */,
+				588DB0682D837FBA00A437B6 /* Dummy.swift */,
 				585C44F32D4987AE005F9864 /* UniqueURLResolver.swift */,
 				583388092D492A6500F00D1E /* DirectoryManager.swift */,
 				5833880B2D492A9100F00D1E /* FileProcessor.swift */,
@@ -178,12 +184,14 @@
 			files = (
 				585C44F42D4987AE005F9864 /* UniqueURLResolver.swift in Sources */,
 				5833880A2D492A6500F00D1E /* DirectoryManager.swift in Sources */,
+				588DB0692D837FBA00A437B6 /* Dummy.swift in Sources */,
 				58800F282A43624E0072E152 /* ContentView.swift in Sources */,
 				585C44F62D49885D005F9864 /* Account.swift in Sources */,
 				585C44EF2D498786005F9864 /* DirectoryNameGenerator.swift in Sources */,
 				58800F262A43624E0072E152 /* PDF_OrganizerApp.swift in Sources */,
 				5833880C2D492A9100F00D1E /* FileProcessor.swift in Sources */,
 				585C44F82D4988A8005F9864 /* AccountingType.swift in Sources */,
+				588DB0672D837FA400A437B6 /* Suffixable.swift in Sources */,
 				585C44F12D498799005F9864 /* FilenameGenerator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
