@@ -19,11 +19,11 @@ import Foundation
 ///
 /// Given a file named:
 /// ```
-/// NameGirokonto-2782161234-Kontoauszug-20200101.pdf
+/// BanknameGirokonto-2782161234-Kontoauszug-20200101.pdf
 /// ```
 /// The resulting directory structure would be:
 /// ```
-/// Owner/Bankname/2782161234/Kontoauszug/2019/
+/// Owner/Bankname/2782161234/2019/
 /// ```
 /// And the expected new filename would be:
 /// ```
@@ -32,8 +32,8 @@ import Foundation
 ///
 /// ## Example Code
 /// ```swift
-/// let fileURL = URL(fileURLWithPath: "/Documents/NameGirokonto-2782161234-Kontoauszug-20200101.pdf")
-/// let accounts: [Account] = [.carstenGirokonto]
+/// let fileURL = URL(fileURLWithPath: "/Documents/BanknameGirokonto-2782161234-Kontoauszug-20200101.pdf")
+/// let accounts: [Account] = [.girokonto]
 /// if let directory = DirectoryNameGenerator.generate(from: fileURL, using: accounts) {
 ///     print("Generated Directory: \(directory)")
 /// }
@@ -45,12 +45,12 @@ import Foundation
 /// 3. Extracts the **date** from the filename and shifts it **one month back**.
 /// 4. Constructs the directory path in the format:
 ///    ```
-///    Owner/Bankname/AccountNumber/DocumentType/Year
+///    Owner/Bankname/AccountNumber/Year
 ///    ```
 ///
 /// ## Example Outputs:
 /// ```
-/// Generated Directory: Carsten/ING/2782161234/Kontoauszug/2019
+/// Generated Directory: Carsten/ING/2782161234/2019
 /// ```
 ///
 class DirectoryNameGenerator {
@@ -67,13 +67,7 @@ class DirectoryNameGenerator {
     static func generate(from url: URL, using accounts: [Account]) -> String? {
         guard let accountName = accounts.matches(filename: url.lastPathComponent) else { return nil }
 
-        var directoryName = accountName.directory
-
-        // Append document type if found in filename
-        for type in DocumentType.allCases where url.lastPathComponent.contains(type.rawValue) {
-            directoryName.append(type.dic)
-            break
-        }
+        let directoryName = accountName.directory
 
         if accountName is YearBreakdownSkippable {
             return directoryName
