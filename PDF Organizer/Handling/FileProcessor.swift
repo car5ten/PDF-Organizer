@@ -65,7 +65,8 @@ class FileProcessor {
             guard directoryManager.createDirectorySafely(at: targetDirectory) else { return false }
 
             // Step 3: Rename the file
-            guard let newFilename = FilenameGenerator.generate(from: itemUrl.deletingPathExtension().lastPathComponent, using: accounts) else { return false }
+            guard var newFilename = FilenameGenerator.generate(from: itemUrl.deletingPathExtension().lastPathComponent, using: accounts) else { return false }
+
 
             // Step 4: Resolve unique URL
             let newUrl = UniqueURLResolver.resolve(baseUrl: targetDirectory.appendingPathComponent(newFilename).appendingPathExtension(for: .pdf))

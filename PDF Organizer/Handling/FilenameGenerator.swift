@@ -63,7 +63,11 @@ class FilenameGenerator {
 
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM"
-        return "\(dateFormatter.string(from: adjustedDate))-\(accountName.accountNumber)"
+        if let suffixable = accountName as? Suffixable {
+            return "\(dateFormatter.string(from: adjustedDate))-\(accountName.accountNumber)-\(suffixable.suffix)"
+        } else {
+            return "\(dateFormatter.string(from: adjustedDate))-\(accountName.accountNumber)"
+        }
     }
 
     /// Extracts a date from the filename.
