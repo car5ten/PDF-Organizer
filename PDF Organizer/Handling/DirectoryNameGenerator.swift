@@ -75,6 +75,10 @@ class DirectoryNameGenerator {
             break
         }
 
+        if accountName is YearBreakdownSkippable {
+            return directoryName
+        }
+
         // Extract and adjust date by shifting back one month
         guard let date = extractDate(from: url.deletingPathExtension().lastPathComponent),
               let adjustedDate = Calendar.current.date(byAdding: .month, value: -1, to: date) else { return nil }
