@@ -52,7 +52,7 @@ class FileProcessor {
     /// - Parameter provider: The `NSItemProvider` containing the dropped PDF file.
     /// - Returns: `true` if processing is successful, `false` otherwise.
     func processFile(provider: NSItemProvider) async -> Bool {
-        let accounts: [Account] = AccountName.allCases
+        let accounts: [Account] = Accounts.all
         guard provider.hasItemConformingToTypeIdentifier(UTType.pdf.identifier),
               let itemUrl = try? await provider.loadItem(forTypeIdentifier: UTType.pdf.identifier) as? URL else { return false }
 

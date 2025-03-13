@@ -12,30 +12,16 @@ protocol Account {
     var directory: String { get }
 }
 
-/// An enum representing predefined bank accounts.
-enum AccountName: String, CaseIterable, Account {
-    case Dummy
+struct Dummy: Account {
+    var accountNumber: String { "2782161234" }
+    var keywords: [String] { ["Bankname", accountNumber] }
+    var directory: String { "Owner/Bankname/\(accountNumber)" }
+}
 
-    /// The account number associated with each account.
-    var accountNumber: String {
-        switch self {
-            case .Dummy: return "2782161234"
-        }
-    }
-
-    /// Keywords used to identify the account in filenames.
-    var keywords: [String] {
-        switch self {
-            case .Dummy: return [accountNumber, "Bankname"]
-        }
-    }
-
-    /// Directory path for storing files related to this account.
-    var directory: String {
-        switch self {
-            case .Dummy: return "Owner/Bankname/\(accountNumber)"
-        }
-    }
+enum Accounts {
+    static let all: [Account] = [
+        Dummy()
+    ]
 }
 
 extension Array where Element == Account {

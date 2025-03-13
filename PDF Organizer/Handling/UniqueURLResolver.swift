@@ -47,8 +47,8 @@ class UniqueURLResolver {
         var counter = 1
         while FileManager.default.fileExists(atPath: uniqueUrl.path) {
             uniqueUrl = baseUrl.deletingPathExtension()
-                .appendingPathExtension("copy\(counter)")
-                .appendingPathExtension(for: .pdf)
+                .appendingPathComponent("\(baseUrl.deletingPathExtension().lastPathComponent).copy\(counter)")
+                .appendingPathExtension("pdf")
             counter += 1
         }
         return uniqueUrl

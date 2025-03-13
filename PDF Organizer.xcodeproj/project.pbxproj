@@ -12,7 +12,7 @@
 		585C44EF2D498786005F9864 /* DirectoryNameGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585C44EE2D498786005F9864 /* DirectoryNameGenerator.swift */; };
 		585C44F12D498799005F9864 /* FilenameGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585C44F02D498799005F9864 /* FilenameGenerator.swift */; };
 		585C44F42D4987AE005F9864 /* UniqueURLResolver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585C44F32D4987AE005F9864 /* UniqueURLResolver.swift */; };
-		585C44F62D49885D005F9864 /* AccountName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585C44F52D49885C005F9864 /* AccountName.swift */; };
+		585C44F62D49885D005F9864 /* Account.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585C44F52D49885C005F9864 /* Account.swift */; };
 		585C44F82D4988A8005F9864 /* AccountingType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585C44F72D49888C005F9864 /* AccountingType.swift */; };
 		58800F262A43624E0072E152 /* PDF_OrganizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58800F252A43624E0072E152 /* PDF_OrganizerApp.swift */; };
 		58800F282A43624E0072E152 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58800F272A43624E0072E152 /* ContentView.swift */; };
@@ -26,7 +26,7 @@
 		585C44EE2D498786005F9864 /* DirectoryNameGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryNameGenerator.swift; sourceTree = "<group>"; };
 		585C44F02D498799005F9864 /* FilenameGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilenameGenerator.swift; sourceTree = "<group>"; };
 		585C44F32D4987AE005F9864 /* UniqueURLResolver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniqueURLResolver.swift; sourceTree = "<group>"; };
-		585C44F52D49885C005F9864 /* AccountName.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountName.swift; sourceTree = "<group>"; };
+		585C44F52D49885C005F9864 /* Account.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Account.swift; sourceTree = "<group>"; };
 		585C44F72D49888C005F9864 /* AccountingType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountingType.swift; sourceTree = "<group>"; };
 		58800F222A43624E0072E152 /* PDF Organizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "PDF Organizer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		58800F252A43624E0072E152 /* PDF_OrganizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PDF_OrganizerApp.swift; sourceTree = "<group>"; };
@@ -51,7 +51,7 @@
 			isa = PBXGroup;
 			children = (
 				585C44F72D49888C005F9864 /* AccountingType.swift */,
-				585C44F52D49885C005F9864 /* AccountName.swift */,
+				585C44F52D49885C005F9864 /* Account.swift */,
 				585C44F32D4987AE005F9864 /* UniqueURLResolver.swift */,
 				583388092D492A6500F00D1E /* DirectoryManager.swift */,
 				5833880B2D492A9100F00D1E /* FileProcessor.swift */,
@@ -179,7 +179,7 @@
 				585C44F42D4987AE005F9864 /* UniqueURLResolver.swift in Sources */,
 				5833880A2D492A6500F00D1E /* DirectoryManager.swift in Sources */,
 				58800F282A43624E0072E152 /* ContentView.swift in Sources */,
-				585C44F62D49885D005F9864 /* AccountName.swift in Sources */,
+				585C44F62D49885D005F9864 /* Account.swift in Sources */,
 				585C44EF2D498786005F9864 /* DirectoryNameGenerator.swift in Sources */,
 				58800F262A43624E0072E152 /* PDF_OrganizerApp.swift in Sources */,
 				5833880C2D492A9100F00D1E /* FileProcessor.swift in Sources */,
