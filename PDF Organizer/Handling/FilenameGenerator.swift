@@ -62,7 +62,11 @@ class FilenameGenerator {
               let adjustedDate = Calendar.current.date(byAdding: .month, value: -1, to: date) else { return nil }
 
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM"
+        if let dateRepresentable = accountName as? DateRepresentable {
+            dateFormatter.dateFormat = dateRepresentable.dateFormat
+        } else {
+            dateFormatter.dateFormat = "yyyy-MM"
+        }
         if let suffixable = accountName as? Suffixable {
             return "\(dateFormatter.string(from: adjustedDate))-\(accountName.accountNumber)-\(suffixable.suffix)"
         } else {

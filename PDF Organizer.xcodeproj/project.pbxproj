@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5811808A2DAD1A7000D6A523 /* DateRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581180892DAD1A7000D6A523 /* DateRepresentable.swift */; };
 		5833880A2D492A6500F00D1E /* DirectoryManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 583388092D492A6500F00D1E /* DirectoryManager.swift */; };
 		5833880C2D492A9100F00D1E /* FileProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5833880B2D492A9100F00D1E /* FileProcessor.swift */; };
 		585C44EF2D498786005F9864 /* DirectoryNameGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585C44EE2D498786005F9864 /* DirectoryNameGenerator.swift */; };
@@ -23,6 +24,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		581180892DAD1A7000D6A523 /* DateRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateRepresentable.swift; sourceTree = "<group>"; };
 		583388092D492A6500F00D1E /* DirectoryManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryManager.swift; sourceTree = "<group>"; };
 		5833880B2D492A9100F00D1E /* FileProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileProcessor.swift; sourceTree = "<group>"; };
 		585C44EE2D498786005F9864 /* DirectoryNameGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryNameGenerator.swift; sourceTree = "<group>"; };
@@ -63,6 +65,7 @@
 				585C44EE2D498786005F9864 /* DirectoryNameGenerator.swift */,
 				585C44F02D498799005F9864 /* FilenameGenerator.swift */,
 				588DB06A2D837FF100A437B6 /* YearBreakdownSkippable.swift */,
+				581180892DAD1A7000D6A523 /* DateRepresentable.swift */,
 			);
 			path = Handling;
 			sourceTree = "<group>";
@@ -182,6 +185,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5811808A2DAD1A7000D6A523 /* DateRepresentable.swift in Sources */,
 				588DB06B2D837FF100A437B6 /* YearBreakdownSkippable.swift in Sources */,
 				585C44F42D4987AE005F9864 /* UniqueURLResolver.swift in Sources */,
 				5833880A2D492A6500F00D1E /* DirectoryManager.swift in Sources */,
